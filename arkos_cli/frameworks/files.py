@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import click
 
+from utils import CLIException
+
 
 @click.group()
 def files():
@@ -8,25 +10,115 @@ def files():
     pass
 
 @files.command()
+@click.pass_context
+def list_shares(ctx):
+    """List all fileshare links"""
+    try:
+        if ctx.obj["conn_method"] == "remote":
+            data = ctx.obj["client"].files.get_shares()
+        elif ctx.obj["conn_method"] == "local":
+            from arkos import shared_files
+            data = [x.as_dict for x in shared_files.get()]
+    except Exception, e:
+        raise CLIException(str(e))
+    else:
+        for x in data:
+            click.echo(click.style(x["path"], fg="green") + " ({})".format(x["id"]))
+            click.secho(u" ↳ Expires: {}".format("Never" if not x["expires"] else x["expires_at"].strftime("%c")),
+                fg="white")
+
+@files.command()
+@click.argument("path")
+@click.option("--expires", default=0, help="Unix timestamp for when the share link should expire, or 0 to last forever")
+@click.pass_context
+def add_share(ctx, path, expires):
+    """Create a fileshare link"""
+    try:
+        if ctx.obj["conn_method"] == "remote":
+            data = ctx.obj["client"].files.share(path, expires)
+        elif ctx.obj["conn_method"] == "local":
+            from arkos import shared_files
+            from arkos.utils import random_string
+            share = shared_files.Share(random_string(), path, expires)
+            share.add()
+            data = share.serialized
+    except Exception, e:
+        raise CLIException(str(e))
+    else:
+        click.secho("Share created!", fg="green")
+        click.echo("Link is your external server address, plus: /shared/{}".format(data["id"]))
+
+@files.command()
+@click.argument("id")
+@click.option("--expires", default=0, help="Unix timestamp for when the share link should expire, or 0 to last forever")
+@click.pass_context
+def update_share(ctx, id, expires):
+    """Update a fileshare link's expiration"""
+    try:
+        if ctx.obj["conn_method"] == "remote":
+            data = ctx.obj["client"].files.update_share(id, expires)
+        elif ctx.obj["conn_method"] == "local":
+            from arkos import shared_files
+            share = shared_files.get(id)
+            share.update_expiry(expires)
+    except Exception, e:
+        raise CLIException(str(e))
+    else:
+        click.secho("Share updated!", fg="green")
+
+@files.command()
+@click.argument("id")
+@click.pass_context
+def remove_share(ctx, id):
+    """Disable a fileshare link"""
+    try:
+        if ctx.obj["conn_method"] == "remote":
+            data = ctx.obj["client"].files.remove_share(id)
+        elif ctx.obj["conn_method"] == "local":
+            from arkos import shared_files
+            share = shared_files.get(id)
+            share.delete()
+    except Exception, e:
+        raise CLIException(str(e))
+    else:
+        click.echo("Share removed")
+
+@files.command()
+@click.argument("path")
+@click.argument("out_path", type=click.File("wb"))
+@click.pass_context
+def download(ctx, path, out_path):
+    """Download a file/folder from the server (remote connections only)"""
+    try:
+        if ctx.obj["conn_method"] == "remote":
+            data = ctx.obj["client"].files.download(path)
+            f.write(data)
+    except Exception, e:
+        raise CLIException(str(e))
+
+@files.command()
 @click.argument("path")
 @click.pass_context
 def edit(ctx, path):
-    if ctx.obj["conn_method"] == "remote":
-        data = ctx.obj["client"].files.get(path, content=True)
-        out = click.edit(data["content"])
-        if out:
-            ctx.obj["client"].files.edit(path, out)
-            click.secho("File saved as {}".format(path), bold=True)
-        else:
-            click.secho("File not saved.", bold=True)
-    elif ctx.obj["conn_method"] == "local":
-        with open(path, "r") as f:
-            out = click.edit(f.read())
-        if out:
-            with open(path, "w") as f:
-                f.write(out)
-            click.secho("File saved as {}".format(path), bold=True)
-        else:
-            click.secho("File not saved.", bold=True)
+    try:
+        if ctx.obj["conn_method"] == "remote":
+            data = ctx.obj["client"].files.get(path, content=True)
+            out = click.edit(data["content"])
+            if out:
+                ctx.obj["client"].files.edit(path, out)
+                click.secho("File saved as {}".format(path), bold=True)
+            else:
+                click.secho("File not saved.", bold=True)
+        elif ctx.obj["conn_method"] == "local":
+            with open(path, "r") as f:
+                out = click.edit(f.read())
+            if out:
+                with open(path, "w") as f:
+                    f.write(out)
+                click.secho("File saved as {}".format(path), bold=True)
+            else:
+                click.secho("File not saved.", bold=True)
+    except Exception, e:
+        raise CLIException(str(e))
 
 GROUPS = [files]

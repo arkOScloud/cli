@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import click
 
+from utils import CLIException
+
 
 @click.command()
 @click.pass_context

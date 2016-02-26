@@ -45,7 +45,7 @@ def main(ctx, local, host, user, password, apikey):
         try:
             ctx.obj["client"] = pyarkosclient.arkOS(host, user, password, api_key=apikey)
         except Exception, e:
-            raise CLIException(e)
+            raise CLIException(str(e))
     elif local or not host:
         ctx.obj["conn_method"] = "local"
         try:
