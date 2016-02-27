@@ -13,31 +13,23 @@ def system():
 @click.pass_context
 def shutdown(ctx):
     """Shutdown the system now"""
-    try:
-        if ctx.obj["conn_method"] == "remote":
-            ctx.obj["client"].system.shutdown()
-        elif ctx.obj["conn_method"] == "local":
-            from arkos.system import sysconfig
-            sysconfig.shutdown()
-    except Exception, e:
-        raise CLIException(str(e))
-    else:
-        click.echo("Shutdown initiated.")
+    if ctx.obj["conn_method"] == "remote":
+        ctx.obj["client"].system.shutdown()
+    elif ctx.obj["conn_method"] == "local":
+        from arkos.system import sysconfig
+        sysconfig.shutdown()
+    click.echo("Shutdown initiated.")
 
 @system.command()
 @click.pass_context
 def reboot(ctx):
     """Reboot the system now"""
-    try:
-        if ctx.obj["conn_method"] == "remote":
-            ctx.obj["client"].system.reboot()
-        elif ctx.obj["conn_method"] == "local":
-            from arkos.system import sysconfig
-            sysconfig.reboot()
-    except Exception, e:
-        raise CLIException(str(e))
-    else:
-        click.echo("Reboot initiated.")
+    if ctx.obj["conn_method"] == "remote":
+        ctx.obj["client"].system.reboot()
+    elif ctx.obj["conn_method"] == "local":
+        from arkos.system import sysconfig
+        sysconfig.reboot()
+    click.echo("Reboot initiated.")
 
 @system.command()
 @click.pass_context

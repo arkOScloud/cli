@@ -42,9 +42,9 @@ def list(ctx):
 
 @websites.command()
 @click.argument("id")
-@click.option("--site-type", help="Type identifier for website (see list of Apps)")
-@click.option("--address", help="The domain (with subdomain) to make this site available on. Must have added via Domains")
-@click.option("--port", type=int, help="The port number to make the site available on (default 80)")
+@click.option("--site-type", prompt=True, help="Type identifier for website (see list of Apps)")
+@click.option("--address", prompt=True, help="The domain (with subdomain) to make this site available on. Must have added via Domains")
+@click.option("--port", prompt=True, type=int, help="The port number to make the site available on (default 80)")
 @click.option("--extra-data", help="Any extra data your site might require")
 @click.pass_context
 def add(ctx, id, site_type, address, port, extra_data):
@@ -53,14 +53,20 @@ def add(ctx, id, site_type, address, port, extra_data):
         edata = {}
         if extra_data:
             for x in extra_data.split(","):
-                for y in x.split("="):
-                    edata[y[0]] = y[1]
+                edata[x.split("=")[0]] = x.split("=")[1]
         if ctx.obj["conn_method"] == "remote":
-            job, data = ctx.obj["client"].websites.create(id, site_type, address, port, edata)
+            stype = ctx.obj["client"].applications.get(id=site_type.lower())
+            if stype.get("website_options") and not extra_data:
+                for x in stype["website_options"]:
+                    edata[x["id"]] = click.prompt(x["name"])
+            job, data = ctx.obj["client"].websites.create(id, site_type.lower(), address, port, edata)
             handle_job(job)
         elif ctx.obj["conn_method"] == "local":
             from arkos import applications, websites
-            sapp = applications.get(site_type)
+            sapp = applications.get(site_type.lower())
+            if hasattr(sapp, "website_options") and not extra_data:
+                for x in sapp.website_options:
+                    edata[x["id"]] = click.prompt(x["name"])
             site = sapp._website
             site = site(id, address, port)
             site.install(sapp, edata, True, ClickMessager())
@@ -166,4 +172,4 @@ add.aliases = ["create", "install"]
 edit.aliases = ["change"]
 update.aliases = ["upgrade"]
 remove.aliases = ["delete"]
-GROUPS = [[websites, "website", "site", "web"]]
+GROUPS = [[websites, "website", "sites", "site", "web"]]
