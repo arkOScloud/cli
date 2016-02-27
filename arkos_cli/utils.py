@@ -2,6 +2,8 @@
 import click
 import time
 
+from functools import update_wrapper
+
 
 class CLIException(click.ClickException):
     def show(self, file=None):
@@ -30,6 +32,18 @@ class ClickMessager:
         click.secho(msg, bold=True)
 
 
+class AliasedGroup(click.Group):
+    def get_command(self, ctx, cmd_name):
+        rv = click.Group.get_command(self, ctx, cmd_name)
+        if rv is not None:
+            return rv
+
+        for x in self.list_commands(ctx):
+            rv = click.Group.get_command(self, ctx, x)
+            if hasattr(rv, "aliases") and cmd_name in rv.aliases:
+                return rv
+
+
 def handle_job(job):
     msg = None
     while job.status == "running":
@@ -56,3 +70,16 @@ def handle_job(job):
 def abort_if_false(ctx, param, value):
     if not value:
         ctx.abort()
+
+def str_fsize(sz):
+    # Format a size int/float to the most appropriate string.
+    if sz < 1024:
+        return "%.1f bytes" % sz
+    sz /= 1024.0
+    if sz < 1024:
+        return "%.1f Kb" % sz
+    sz /= 1024.0
+    if sz < 1024:
+        return "%.1f Mb" % sz
+    sz /= 1024.0
+    return "%.1f Gb" % sz

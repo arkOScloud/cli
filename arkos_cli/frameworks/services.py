@@ -126,4 +126,4 @@ def status(ctx, name):
         click.secho(u" ↳ Enabled on boot: {}".format("Yes" if svc["enabled"] else "No"), fg="white")
 
 
-GROUPS = [services]
+GROUPS = [[services, "service", "svc"]]

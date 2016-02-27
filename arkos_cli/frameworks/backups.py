@@ -2,10 +2,10 @@
 import click
 import time
 
-from utils import handle_job, CLIException, ClickMessager
+from utils import AliasedGroup, handle_job, CLIException, ClickMessager
 
 
-@click.group()
+@click.command(cls=AliasedGroup)
 def backups():
     """Backups commands"""
     pass
@@ -111,4 +111,8 @@ def delete(ctx, id):
         click.echo("Backup deleted")
 
 
-GROUPS = [backups]
+list.aliases = ["backups"]
+types.aliases = ["list-types", "list-apps", "list-sites", "apps", "sites"]
+create.aliases = ["add", "backup"]
+delete.aliases = ["remove"]
+GROUPS = [[backups, "bak"]]

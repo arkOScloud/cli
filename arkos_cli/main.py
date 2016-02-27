@@ -4,7 +4,7 @@ import imp
 import os
 import pyarkosclient
 
-from utils import CLIException
+from utils import AliasedGroup, CLIException
 
 
 VERSION = "0.1"
@@ -18,7 +18,9 @@ def get_sources():
         mod = x.split(".py")[0]
         fmwk = imp.load_module(mod, *imp.find_module(mod, [frameworks_folder]))
         for y in fmwk.GROUPS:
-            main.add_command(y)
+            grp = y[0]
+            grp.aliases = y[1:]
+            main.add_command(grp)
 
 def get_arkosrc():
     default_map = {}
@@ -30,7 +32,7 @@ def get_arkosrc():
     return default_map
 
 
-@click.group()
+@click.command(cls=AliasedGroup)
 @click.option("--local", envvar="ARKOS_CLI_FORCE_LOCAL", type=bool, default=None, help="Use in local context")
 @click.option("--host", envvar="ARKOS_CLI_HOST", default="", help="Connect to remote arkOS server (host:port)")
 @click.option("--user", envvar="ARKOS_CLI_USER", default="", help="Username for remote connection")

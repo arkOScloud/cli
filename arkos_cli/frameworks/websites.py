@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import click
 
-from utils import abort_if_false, handle_job, CLIException, ClickMessager
+from utils import AliasedGroup, abort_if_false, handle_job, CLIException, ClickMessager
 
 
-@click.group()
+@click.command(cls=AliasedGroup)
 def websites():
     """Website commands"""
     pass
@@ -21,6 +21,8 @@ def _list_websites(sites):
         click.secho(u" ↳ Site Type: " + x["site_name"], fg="white")
         click.secho(u" ↳ Uses SSL: {}".format("Yes" if x["certificate"] else "No"), fg="white")
         click.secho(u" ↳ Enabled: {}".format("Yes" if x["enabled"] else "No"), fg="white")
+        if x.get("has_update"):
+            click.secho(u" ↳ Update available!", fg="green")
 
 
 @websites.command()
@@ -67,6 +69,79 @@ def add(ctx, id, site_type, address, port, extra_data):
 
 @websites.command()
 @click.argument("id")
+@click.option("--address", help="The domain (with subdomain) to make this site available on. Must have added via Domains")
+@click.option("--port", type=int, help="The port number to make the site available on (default 80)")
+@click.option("--new_name", default="", help="Any extra data your site might require")
+@click.pass_context
+def edit(ctx, id, address, port, new_name):
+    """Edit a website"""
+    try:
+        if ctx.obj["conn_method"] == "remote":
+            ctx.obj["client"].websites.edit(id, new_name, address, port)
+        elif ctx.obj["conn_method"] == "local":
+            from arkos import websites
+            site = websites.get(id)
+            site.addr = address
+            site.port = port
+            site.edit(new_name or None)
+    except Exception, e:
+        raise CLIException(str(e))
+    else:
+        click.secho("Site edited successfully.", fg="green")
+
+@websites.command()
+@click.argument("id")
+@click.pass_context
+def enable(ctx, id):
+    """Enable a website"""
+    try:
+        if ctx.obj["conn_method"] == "remote":
+            ctx.obj["client"].websites.enable(id)
+        elif ctx.obj["conn_method"] == "local":
+            from arkos import websites
+            site = websites.get(id)
+            site.nginx_enable()
+    except Exception, e:
+        raise CLIException(str(e))
+    else:
+        click.secho("Site enabled.", fg="green")
+
+@websites.command()
+@click.argument("id")
+@click.pass_context
+def disable(ctx, id):
+    """Disable a website"""
+    try:
+        if ctx.obj["conn_method"] == "remote":
+            ctx.obj["client"].websites.disable(id)
+        elif ctx.obj["conn_method"] == "local":
+            from arkos import websites
+            site = websites.get(id)
+            site.nginx_disable()
+    except Exception, e:
+        raise CLIException(str(e))
+    else:
+        click.secho("Site disabled.", fg="red")
+
+@websites.command()
+@click.argument("id")
+@click.pass_context
+def update(ctx, id):
+    """Update a website"""
+    try:
+        if ctx.obj["conn_method"] == "remote":
+            ctx.obj["client"].websites.update(id)
+        elif ctx.obj["conn_method"] == "local":
+            from arkos import websites
+            site = websites.get(id)
+            site.update()
+    except Exception, e:
+        raise CLIException(str(e))
+    else:
+        click.secho("Site updated successfully.", fg="green")
+
+@websites.command()
+@click.argument("id")
 @click.option("--yes", is_flag=True, callback=abort_if_false,
               expose_value=False, prompt='Are you sure you want to remove this site?')
 @click.pass_context
@@ -86,4 +161,9 @@ def remove(ctx, id):
         click.secho("Website removed successfully.", bold=True)
 
 
-GROUPS = [websites]
+list.aliases = ["websites", "sites"]
+add.aliases = ["create", "install"]
+edit.aliases = ["change"]
+update.aliases = ["upgrade"]
+remove.aliases = ["delete"]
+GROUPS = [[websites, "website", "site", "web"]]

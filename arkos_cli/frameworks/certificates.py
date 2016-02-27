@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 import click
 
-from utils import abort_if_false, handle_job, CLIException, ClickMessager
+from utils import AliasedGroup, abort_if_false, handle_job, CLIException, ClickMessager
 
 
-@click.group()
-def certs():
+@click.command(cls=AliasedGroup)
+def certificates():
     """SSL/TLS Certificates commands"""
     pass
 
 
-@certs.command()
+@certificates.command()
 @click.pass_context
 def list(ctx):
     """List all certificates"""
@@ -33,7 +33,7 @@ def list(ctx):
             if x["assigns"]:
                 click.secho(u" ↳ Assigned to: " + ", ".join([y["name"] for y in x["assigns"]]), fg="white")
 
-@certs.command()
+@certificates.command()
 @click.pass_context
 def list_authorities(ctx):
     """List all certificate authorities (CAs)"""
@@ -52,7 +52,7 @@ def list_authorities(ctx):
             click.secho(x["id"], fg="green")
             click.secho(u" ↳ Expires: {}".format(x["expiry"].strftime("%c")), fg="white")
 
-@certs.command()
+@certificates.command()
 @click.pass_context
 def assigns(ctx):
     """List all apps/sites that can use certificates"""
@@ -77,7 +77,7 @@ def assigns(ctx):
         for x in assigns:
             click.echo(click.style(x["name"], fg="green") + click.style(" (" + x["type"].capitalize() +")", fg="yellow"))
 
-@certs.command()
+@certificates.command()
 @click.argument("name")
 @click.option("--domain", help="Fully-qualified domain name of the certificate. Must match a domain present on the system")
 @click.option("--country", help="Two-character country code (ex.: 'US' or 'CA')")
@@ -116,7 +116,7 @@ def generate(ctx, name, domain, country, state, locale, email, keytype, keylengt
     else:
         click.secho("Certificate generated", fg="yellow")
 
-@certs.command()
+@certificates.command()
 @click.argument("name")
 @click.argument("certfile", type=click.File("r"))
 @click.argument("keyfile", type=click.File("r"))
@@ -137,7 +137,7 @@ def upload(ctx, name, certfile, keyfile, chainfile):
     else:
         click.secho("Certificate uploaded!", fg="yellow")
 
-@certs.command()
+@certificates.command()
 @click.argument("id")
 @click.argument("type")
 @click.argument("appid")
@@ -158,7 +158,7 @@ def assign(ctx, id, type, appid, specialid):
     else:
         click.echo("Certificate {} assigned to {}".format(id, appid))
 
-@certs.command()
+@certificates.command()
 @click.argument("id")
 @click.argument("type")
 @click.argument("appid")
@@ -178,7 +178,7 @@ def unassign(ctx, id, type, appid, specialid):
     else:
         click.echo("Certificate {} unassigned from {}".format(id, appid))
 
-@certs.command()
+@certificates.command()
 @click.argument("id")
 @click.option("--yes", is_flag=True, callback=abort_if_false,
               expose_value=False, prompt='Are you sure you want to remove this site?')
@@ -198,4 +198,8 @@ def delete(ctx, id):
         click.echo("Certificate deleted")
 
 
-GROUPS = [certs]
+assigns.aliases = ["types", "apps", "sites"]
+generate.aliases = ["create", "add"]
+list_authorities.aliases = ["list-authorities", "authorities", "cas", "auths"]
+delete.aliases = ["remove"]
+GROUPS = [[certificates, "certificate", "crt", "cert", "certs"]]

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import click
 
-from utils import CLIException
+from utils import AliasedGroup, CLIException
 
 
-@click.group()
+@click.command(cls=AliasedGroup)
 def databases():
     """Database commands"""
     pass
@@ -175,4 +175,13 @@ def drop_user(ctx, name):
         click.echo("Database user dropped.")
 
 
-GROUPS = [databases]
+list.aliases = ["dbs"]
+list_users.aliases = ["list-users", "users"]
+list_types.aliases = ["list-types", "types", "engines"]
+add.aliases = ["create", "new"]
+add_user.aliases = ["add-user", "create-user", "new-user"]
+dump.aliases = ["export", "backup"]
+chmod.aliases = ["permissions", "perms"]
+drop.aliases = ["remove", "delete"]
+drop_user.aliases = ["drop-user", "remove-user", "delete-user"]
+GROUPS = [[databases, "database", "dbs", "db"]]

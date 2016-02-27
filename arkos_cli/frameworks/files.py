@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import click
 
-from utils import CLIException
+from utils import AliasedGroup, CLIException
 
 
-@click.group()
+@click.command(cls=AliasedGroup)
 def files():
     """File commands"""
     pass
@@ -100,6 +100,7 @@ def download(ctx, path, out_path):
 @click.argument("path")
 @click.pass_context
 def edit(ctx, path):
+    """Open a file in your default editor"""
     try:
         if ctx.obj["conn_method"] == "remote":
             data = ctx.obj["client"].files.get(path, content=True)
@@ -121,4 +122,9 @@ def edit(ctx, path):
     except Exception, e:
         raise CLIException(str(e))
 
-GROUPS = [files]
+
+list_shares.aliases = ["list-shares", "shares"]
+add_share.aliases = ["add-share", "new-share", "create-share", "share", "share-url"]
+update_share.aliases = ["update-share", "edit-share", "expire-share"]
+remove_share.aliases = ["remove-share", "delete-share"]
+GROUPS = [[files, "file", "shares", "share"]]

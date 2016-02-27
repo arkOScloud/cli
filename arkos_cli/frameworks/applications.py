@@ -5,7 +5,7 @@ from utils import abort_if_false, handle_job, CLIException, ClickMessager
 
 
 @click.group()
-def apps():
+def applications():
     """Applications commands"""
     pass
 
@@ -18,7 +18,7 @@ def _list_applications(apps):
         click.secho(u" ↳ " + x["description"]["short"], fg="white")
 
 
-@apps.command()
+@applications.command()
 @click.option("--show-hidden", is_flag=True, help="Show hidden apps too (like databases)")
 @click.pass_context
 def list(ctx, show_hidden):
@@ -36,7 +36,7 @@ def list(ctx, show_hidden):
             adata = [x for x in adata if x["type"] in ["app", "website"]]
         _list_applications(adata)
 
-@apps.command()
+@applications.command()
 @click.option("--show-hidden", is_flag=True, help="Show hidden apps too (like databases)")
 @click.pass_context
 def installed(ctx):
@@ -54,7 +54,7 @@ def installed(ctx):
             adata = [x for x in adata if x["type"] in ["app", "website"]]
         _list_applications(adata)
 
-@apps.command()
+@applications.command()
 @click.option("--show-hidden", is_flag=True, help="Show hidden apps too (like databases)")
 @click.pass_context
 def available(ctx):
@@ -72,7 +72,7 @@ def available(ctx):
             adata = [x for x in adata if x["type"] in ["app", "website"]]
         _list_applications(adata)
 
-@apps.command()
+@applications.command()
 @click.argument("id")
 @click.pass_context
 def info(ctx, id):
@@ -99,7 +99,7 @@ def info(ctx, id):
         if [y for y in x["dependencies"] if y["type"] == "app"]:
             click.echo(u" ↳ " + click.style("Depends on:", fg="yellow") + " " + click.style(", ".join([y["name"] for y in x["dependencies"] if y["type"] == "app"]), fg="white"))
 
-@apps.command()
+@applications.command()
 @click.argument("id")
 @click.pass_context
 def install(ctx, id):
@@ -117,7 +117,7 @@ def install(ctx, id):
     else:
         click.secho("Application installed successfully.", bold=True)
 
-@apps.command()
+@applications.command()
 @click.argument("id")
 @click.option("--yes", is_flag=True, callback=abort_if_false,
               expose_value=False, prompt='Are you sure you want to remove this app?')
@@ -138,4 +138,4 @@ def uninstall(ctx, id):
         click.secho("Application uninstalled successfully.", bold=True)
 
 
-GROUPS = [apps]
+GROUPS = [[applications, "application", "app", "apps"]]

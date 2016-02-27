@@ -3,10 +3,10 @@ import click
 import ConfigParser
 import os
 
-from utils import CLIException
+from utils import AliasedGroup, CLIException
 
 
-@click.group()
+@click.command(cls=AliasedGroup)
 def apikeys():
     """API Keys commands"""
     pass
@@ -87,4 +87,6 @@ def revoke(ctx, key):
         click.secho("API key revoked")
 
 
-GROUPS = [apikeys]
+create.aliases = ["add", "new", "generate"]
+revoke.aliases = ["remove", "delete"]
+GROUPS = [[apikeys, "api"]]
