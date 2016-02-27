@@ -61,8 +61,8 @@ def version(ctx):
     elif ctx.obj["conn_method"] == "local":
         from arkos import config
         click.echo(click.style(u" ↳ Connected to: ", fg="yellow") + "Local")
-        click.echo(click.style(u" ↳ arkOS server version: ", fg="yellow") + config.get("enviro", "version", "unknown"))
-        click.echo(click.style(u" ↳ arkOS arch/board: ", fg="yellow") + config.get("enviro", "arch") + " " + config.get("enviro", "board"))
+        click.echo(click.style(u" ↳ arkOS server version: ", fg="yellow") + config.get("enviro", "version", "Unknown"))
+        click.echo(click.style(u" ↳ arkOS arch/board: ", fg="yellow") + config.get("enviro", "arch", "Unknown") + " " + config.get("enviro", "board", "Unknown"))
 
 
 shutdown.aliases = ["halt"]

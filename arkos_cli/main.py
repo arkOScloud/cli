@@ -32,7 +32,7 @@ def get_arkosrc():
     return default_map
 
 
-@click.command(cls=AliasedGroup)
+@click.command(cls=AliasedGroup, context_settings={"default_map": get_arkosrc()})
 @click.option("--local", envvar="ARKOS_CLI_FORCE_LOCAL", type=bool, default=None, help="Use in local context")
 @click.option("--host", envvar="ARKOS_CLI_HOST", default="", help="Connect to remote arkOS server (host:port)")
 @click.option("--user", envvar="ARKOS_CLI_USER", default="", help="Username for remote connection")
@@ -53,13 +53,13 @@ def main(ctx, local, host, user, password, apikey):
         try:
             import arkos
             arkos.init()
+            arkos.initial_scans()
         except:
             raise CLIException("arkOS not installed locally, and no host specified")
     else:
         raise CLIException("arkOS not installed locally, and no connection information specified for remote host.")
 
 
-# FIXME remove after testing
 if __name__ == "__main__":
     get_sources()
-    main(default_map=get_arkosrc())
+    main()

@@ -21,7 +21,7 @@ def start(ctx, name):
             svc = ctx.obj["client"].services.get(id=name)
             state = svc["state"]
         elif ctx.obj["conn_method"] == "local":
-            from arkos import services
+            from arkos.system import services
             svc = services.get(name)
             svc.start()
             state = svc.state
@@ -42,7 +42,7 @@ def stop(ctx, name):
         if ctx.obj["conn_method"] == "remote":
             ctx.obj["client"].services.stop(name)
         elif ctx.obj["conn_method"] == "local":
-            from arkos import services
+            from arkos.system import services
             svc = services.get(name)
             svc.stop()
     except Exception, e:
@@ -60,7 +60,7 @@ def restart(ctx, name):
             svc = ctx.obj["client"].services.restart(name)
             state = svc["state"]
         elif ctx.obj["conn_method"] == "local":
-            from arkos import services
+            from arkos.system import services
             svc = services.get(name)
             svc.restart()
             state = svc.state
@@ -81,7 +81,7 @@ def enable(ctx, name):
         if ctx.obj["conn_method"] == "remote":
             ctx.obj["client"].services.enable(name)
         elif ctx.obj["conn_method"] == "local":
-            from arkos import services
+            from arkos.system import services
             svc = services.get(name)
             svc.enable()
     except Exception, e:
@@ -98,7 +98,7 @@ def disable(ctx, name):
         if ctx.obj["conn_method"] == "remote":
             ctx.obj["client"].services.disable(name)
         elif ctx.obj["conn_method"] == "local":
-            from arkos import services
+            from arkos.system import services
             svc = services.get(name)
             svc.disable()
     except Exception, e:
@@ -115,7 +115,7 @@ def status(ctx, name):
         if ctx.obj["conn_method"] == "remote":
             svc = ctx.obj["client"].services.get(id=name)
         elif ctx.obj["conn_method"] == "local":
-            from arkos import services
+            from arkos.system import services
             svc = services.get(name).as_dict
     except Exception, e:
         raise CLIException(str(e))

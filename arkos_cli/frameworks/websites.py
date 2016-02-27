@@ -33,7 +33,7 @@ def list(ctx):
         if ctx.obj["conn_method"] == "remote":
             adata = ctx.obj["client"].websites.get()
         elif ctx.obj["conn_method"] == "local":
-            from arkos import website
+            from arkos import websites
             adata = [x.serialized for x in websites.get()]
     except Exception, e:
         raise CLIException(str(e))

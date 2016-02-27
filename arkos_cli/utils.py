@@ -16,20 +16,28 @@ class CLIException(click.ClickException):
 class ClickMessager:
     def __init__(self, cls="", msg="", head=""):
         if cls == "error" and msg:
-            raise click.ClickException(msg)
-        if head:
-            click.secho(head, fg="green")
-        click.secho(msg, bold=True)
+            raise CLIException(msg)
+        click.echo((click.style(head + " - ", fg=self._get_cls(cls), bold=True) if head else "") + click.style(msg, fg=self._get_cls(cls)))
+
+    def _get_cls(self, mcls):
+        if mcls == "success":
+            return "green"
+        elif mcls == "warning":
+            return "yellow"
+        elif mcls == "error":
+            return "red"
+        else:
+            return None
 
     def update(self, cls, msg, head=""):
         if cls == "error":
-            raise click.ClickException(msg)
-        click.secho(u" ↳ {}".format(msg), fg="yellow")
+            raise CLIException(msg)
+        click.echo((click.style(head + " - ", fg=self._get_cls(cls), bold=True) if head else "") + click.style(msg, fg=self._get_cls(cls)))
 
     def complete(self, cls, msg, head=""):
         if cls == "error":
-            raise click.ClickException(msg)
-        click.secho(msg, bold=True)
+            raise CLIException(msg)
+        click.echo((click.style(head + " - ", fg=self._get_cls(cls), bold=True) if head else "") + click.style(msg, fg=self._get_cls(cls)))
 
 
 class AliasedGroup(click.Group):
