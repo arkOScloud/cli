@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import click
 
-from utils import AliasedGroup, abort_if_false, CLIException
+from arkos_cli.utils import u, AliasedGroup, abort_if_false, CLIException
 
 
 @click.command(cls=AliasedGroup)
@@ -19,14 +19,14 @@ def users(ctx):
         elif ctx.obj["conn_method"] == "local":
             from arkos.system import users
             data = [x.serialized for x in users.get()]
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         for x in data:
-            click.echo(click.style(x["name"], fg="green") + click.style(" ({})".format(x["id"]), fg="yellow"))
-            click.secho(u" ↳ Name: {}".format(x["first_name"] + (" " + x["last_name"] if x["last_name"] else "")), fg="white")
-            click.secho(u" ↳ Mail Addresses: {}".format(", ".join(x["mail_addresses"])), fg="white")
-            click.secho(u" ↳ Types: {}".format(", ".join([y for y in ["sudo" if x["sudo"] else None, "admin" if x["admin"] else None] if y])), fg="white")
+            click.echo(click.style(x["name"], fg="green") + click.style(" ({0})".format(x["id"]), fg="yellow"))
+            click.secho(u(" ↳ Name: {0}").format(x["first_name"] + (" " + x["last_name"] if x["last_name"] else "")), fg="white")
+            click.secho(u(" ↳ Mail Addresses: {0}").format(", ".join(x["mail_addresses"])), fg="white")
+            click.secho(u(" ↳ Types: {0}").format(", ".join([y for y in ["sudo" if x["sudo"] else None, "admin" if x["admin"] else None] if y])), fg="white")
 
 @roles.command()
 @click.argument("name")
@@ -49,7 +49,7 @@ def useradd(ctx, name, password, domain, first_name, last_name, admin, sudo):
             u = users.User(name=name, first_name=first_name, last_name=last_name,
                 domain=domain, admin=admin, sudo=sudo)
             u.add(password)
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("User added successfully", fg="green")
@@ -82,7 +82,7 @@ def usermod(ctx, name, domain, first_name, last_name, admin, sudo):
             u.admin = admin if admin != None else u.admin
             u.sudo = sudo if sudo != None else u.sudo
             u.update()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("User edited successfully", fg="green")
@@ -106,7 +106,7 @@ def chpasswd(ctx, name, password):
             from arkos.system import users
             u = users.get(name=name)
             u.update(password)
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("Password changed successfully", fg="green")
@@ -130,7 +130,7 @@ def userdel(ctx, name):
             from arkos.system import users
             u = users.get(name=name)
             u.delete()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("User deleted", fg="red")
@@ -145,12 +145,12 @@ def groups(ctx):
         elif ctx.obj["conn_method"] == "local":
             from arkos.system import groups
             data = [x.serialized for x in groups.get()]
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         for x in data:
             click.echo(click.style(x["name"], fg="green") + click.style(" ({})".format(x["id"]), fg="yellow"))
-            click.secho(u" ↳ Members: {}".format(", ".join(x["users"])), fg="white")
+            click.secho(u(" ↳ Members: {0}").format(", ".join(x["users"])), fg="white")
 
 @roles.command()
 @click.argument("name")
@@ -165,7 +165,7 @@ def groupadd(ctx, name, users):
             from arkos.system import groups
             g = groups.Group(name=name, users=users)
             g.add()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("Group added successfully", fg="green")
@@ -197,7 +197,7 @@ def groupmod(ctx, name, operation, username):
             else:
                 g.users.remove(username)
             g.update()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("Group edited successfully", fg="green")
@@ -221,7 +221,7 @@ def groupdel(ctx, name):
             from arkos.system import groups
             g = groups.get(name=name)
             g.delete()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("Group deleted", fg="red")
@@ -236,7 +236,7 @@ def domains(ctx):
         elif ctx.obj["conn_method"] == "local":
             from arkos.system import domains
             data = [x.serialized for x in domains.get()]
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         for x in data:
@@ -254,7 +254,7 @@ def domainadd(ctx, name):
             from arkos.system import domains
             d = domains.Domain(name=name)
             d.add()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("Domain added successfully", fg="green")
@@ -273,7 +273,7 @@ def domaindel(ctx, name):
             from arkos.system import domains
             d = domains.get(name)
             d.remove()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("Domain deleted", fg="red")

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import click
 
-from utils import AliasedGroup, abort_if_false, CLIException, str_fsize
+from arkos_cli.utils import u, AliasedGroup, abort_if_false, CLIException, str_fsize
 
 
 @click.command(cls=AliasedGroup)
@@ -19,15 +19,15 @@ def list(ctx):
         elif ctx.obj["conn_method"] == "local":
             from arkos.system import networks
             data = [x.serialized for x in networks.get_connections()]
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         for x in data:
             click.echo(click.style(x["id"], fg="green") + click.style(" (" + x["config"]["connection"].capitalize() +")", fg="yellow"))
-            click.secho(u" ↳ Addressing: {}".format("DHCP" if x["config"]["ip"] == "dhcp" else x["config"]["ip"]), fg="white")
-            click.secho(u" ↳ Interface: {}".format(x["config"]["interface"]), fg="white")
-            click.secho(u" ↳ Enabled: {}".format("Yes" if x["enabled"] else "No"), fg="white")
-            click.secho(u" ↳ Connected: {}".format("Yes" if x["connected"] else "No"), fg="white")
+            click.secho(u(" ↳ Addressing: {0}").format("DHCP" if x["config"]["ip"] == "dhcp" else x["config"]["ip"]), fg="white")
+            click.secho(u(" ↳ Interface: {0}").format(x["config"]["interface"]), fg="white")
+            click.secho(u(" ↳ Enabled: {0}").format("Yes" if x["enabled"] else "No"), fg="white")
+            click.secho(u(" ↳ Connected: {0}").format("Yes" if x["connected"] else "No"), fg="white")
 
 @networks.command()
 @click.pass_context
@@ -39,15 +39,15 @@ def interfaces(ctx):
         elif ctx.obj["conn_method"] == "local":
             from arkos.system import networks
             data = [x.serialized for x in networks.get_interfaces()]
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         for x in data:
             click.echo(click.style(x["id"], fg="green") + click.style(" (" + x["type"].capitalize() +")", fg="yellow"))
-            click.secho(u" ↳ Rx/Tx: {} / {}".format(str_fsize(x["rx"]), str_fsize(x["tx"])), fg="white")
-            click.secho(u" ↳ Connected: {}".format("Yes" if x["up"] else "No"), fg="white")
+            click.secho(u(" ↳ Rx/Tx: {0} / {1}").format(str_fsize(x["rx"]), str_fsize(x["tx"])), fg="white")
+            click.secho(u(" ↳ Connected: {0}").format("Yes" if x["up"] else "No"), fg="white")
             if x["ip"]:
-                click.secho(u" ↳ Address(es): {}".format(", ".join([y["addr"]+"/"+y["netmask"] for y in x["ip"]])),
+                click.secho(u(" ↳ Address(es): {0}").format(", ".join([y["addr"]+"/"+y["netmask"] for y in x["ip"]])),
                     fg="white")
 
 @networks.command()
@@ -62,7 +62,7 @@ def connect(ctx, id):
             from arkos.system import networks
             n = networks.get(id)
             n.connect()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("Operation completed successfully", fg="green")
@@ -79,7 +79,7 @@ def disconnect(ctx, id):
             from arkos.system import networks
             n = networks.get(id)
             n.disconnect()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("Operation completed successfully", fg="green")
@@ -96,7 +96,7 @@ def enable(ctx, id):
             from arkos.system import networks
             n = networks.get(id)
             n.enable()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("Operation completed successfully", fg="green")
@@ -113,7 +113,7 @@ def disable(ctx, id):
             from arkos.system import networks
             n = networks.get(id)
             n.disable()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("Operation completed successfully", fg="green")
@@ -130,7 +130,7 @@ def delete(ctx, id):
             from arkos.system import networks
             n = networks.get(id)
             n.remove()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("Operation completed successfully", fg="green")

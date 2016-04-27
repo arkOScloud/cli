@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import click
 
-from utils import AliasedGroup, abort_if_false, handle_job, CLIException
+from arkos_cli.utils import AliasedGroup, abort_if_false, handle_job, CLIException
 
 
 @click.command(cls=AliasedGroup)
@@ -25,7 +25,7 @@ def install(ctx, name):
             click.echo("Installing {}...".format(", ".join(name)))
             pacman.install(list(name))
             click.secho("Operation completed successfully", fg="green")
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
 
 @packages.command()
@@ -45,7 +45,7 @@ def remove(ctx, name, purge):
             click.echo("Removing {}...".format(", ".join(name)))
             pacman.remove(list(name), purge=purge)
             click.secho("Operation completed successfully", fg="green")
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
 
 @packages.command()
@@ -58,7 +58,7 @@ def update(ctx):
         elif ctx.obj["conn_method"] == "local":
             import pacman
             pacman.refresh()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("Operation completed successfully", fg="green")
@@ -91,7 +91,7 @@ def upgrade(ctx, yes):
                     click.echo("Upgrading system...")
                     pacman.upgrade()
                     click.secho("Operation completed successfully", fg="green")
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
 
 

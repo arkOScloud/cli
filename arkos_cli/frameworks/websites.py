@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import click
 
-from utils import AliasedGroup, abort_if_false, handle_job, CLIException, ClickMessager
+from arkos_cli.utils import u, AliasedGroup, abort_if_false, handle_job, CLIException, ClickMessager
 
 
 @click.command(cls=AliasedGroup)
@@ -16,13 +16,13 @@ def _list_websites(sites):
     for x in sorted(sites, key=lambda x: x["id"]):
         url = "https://" if x["certificate"] else "http://"
         url += x["addr"]
-        url += (":{}".format(x["port"])) if x["port"] not in [80, 443] else ""
+        url += (":{0}".format(x["port"])) if x["port"] not in [80, 443] else ""
         click.echo(click.style(x["id"], fg="green") + click.style(" (" + url +")", fg="yellow"))
-        click.secho(u" ↳ Site Type: " + x["site_name"], fg="white")
-        click.secho(u" ↳ Uses SSL: {}".format("Yes" if x["certificate"] else "No"), fg="white")
-        click.secho(u" ↳ Enabled: {}".format("Yes" if x["enabled"] else "No"), fg="white")
+        click.secho(u(" ↳ Site Type: ") + x["site_name"], fg="white")
+        click.secho(u(" ↳ Uses SSL: {0}").format("Yes" if x["certificate"] else "No"), fg="white")
+        click.secho(u(" ↳ Enabled: {0}").format("Yes" if x["enabled"] else "No"), fg="white")
         if x.get("has_update"):
-            click.secho(u" ↳ Update available!", fg="green")
+            click.secho(u(" ↳ Update available!"), fg="green")
 
 
 @websites.command()
@@ -35,7 +35,7 @@ def list(ctx):
         elif ctx.obj["conn_method"] == "local":
             from arkos import websites
             adata = [x.serialized for x in websites.get()]
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         _list_websites(adata)
@@ -70,7 +70,7 @@ def add(ctx, id, site_type, address, port, extra_data):
             site = sapp._website
             site = site(id, address, port)
             site.install(sapp, edata, True, ClickMessager())
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
 
 @websites.command()
@@ -90,7 +90,7 @@ def edit(ctx, id, address, port, new_name):
             site.addr = address
             site.port = port
             site.edit(new_name or None)
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("Site edited successfully.", fg="green")
@@ -107,7 +107,7 @@ def enable(ctx, id):
             from arkos import websites
             site = websites.get(id)
             site.nginx_enable()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("Site enabled.", fg="green")
@@ -124,7 +124,7 @@ def disable(ctx, id):
             from arkos import websites
             site = websites.get(id)
             site.nginx_disable()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("Site disabled.", fg="red")
@@ -141,7 +141,7 @@ def update(ctx, id):
             from arkos import websites
             site = websites.get(id)
             site.update()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("Site updated successfully.", fg="green")
@@ -161,7 +161,7 @@ def remove(ctx, id):
             from arkos import websites
             site = websites.get(id)
             site.remove(ClickMessager())
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("Website removed successfully.", bold=True)

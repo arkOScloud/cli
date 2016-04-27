@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import click
 
-from utils import CLIException
+from arkos_cli.utils import u, CLIException
 
 
 @click.group()
@@ -19,15 +19,15 @@ def list(ctx):
         elif ctx.obj["conn_method"] == "local":
             from arkos import tracked_services
             data = [x.serialized for x in tracked_services.get()]
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         for x in data:
             pol, fg = ("Allow All", "green") if x["policy"] == 2 else (("Local Only", "yellow") if x["policy"] == 1 else ("Restricted", "red"))
             click.echo(click.style(x["name"], fg="green") + click.style(" (" + x["id"] +")", fg="yellow"))
-            click.secho(u" ↳ Type: {}".format(x["type"]), fg="white")
-            click.secho(u" ↳ Ports: {}".format(", ".join(["{} {}".format(y[1], y[0].upper()) for y in x["ports"]])), fg="white")
-            click.echo(click.style(u" ↳ Policy: ", fg="white") + click.style(pol, fg=fg))
+            click.secho(u(" ↳ Type: {0}").format(x["type"]), fg="white")
+            click.secho(u(" ↳ Ports: {0}").format(", ".join(["{0} {1}".format(y[1], y[0].upper()) for y in x["ports"]])), fg="white")
+            click.echo(click.style(u(" ↳ Policy: "), fg="white") + click.style(pol, fg=fg))
 
 @security.command()
 @click.argument("id")
@@ -42,7 +42,7 @@ def allow(ctx, id):
             svc = tracked_services.get(id)
             svc.policy = 2
             svc.save()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.echo("Access to service allowed")
@@ -60,7 +60,7 @@ def local(ctx, id):
             svc = tracked_services.get(id)
             svc.policy = 1
             svc.save()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.echo("Access to service restricted to local")
@@ -78,7 +78,7 @@ def block(ctx, id):
             svc = tracked_services.get(id)
             svc.policy = 0
             svc.save()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.echo("Access to service blocked")

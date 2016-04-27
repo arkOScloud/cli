@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import click
 
-from utils import CLIException
+from arkos_cli.utils import u, CLIException
 
 
 @click.group()
@@ -25,7 +25,7 @@ def start(ctx, name):
             svc = services.get(name)
             svc.start()
             state = svc.state
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         if state == "running":
@@ -45,7 +45,7 @@ def stop(ctx, name):
             from arkos.system import services
             svc = services.get(name)
             svc.stop()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("{} stopped".format(name), fg="red")
@@ -64,7 +64,7 @@ def restart(ctx, name):
             svc = services.get(name)
             svc.restart()
             state = svc.state
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         if state == "running":
@@ -84,7 +84,7 @@ def enable(ctx, name):
             from arkos.system import services
             svc = services.get(name)
             svc.enable()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("{} enabled".format(name), fg="green")
@@ -101,7 +101,7 @@ def disable(ctx, name):
             from arkos.system import services
             svc = services.get(name)
             svc.disable()
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
         click.secho("{} disabled".format(name), fg="red")
@@ -117,13 +117,13 @@ def status(ctx, name):
         elif ctx.obj["conn_method"] == "local":
             from arkos.system import services
             svc = services.get(name).as_dict
-    except Exception, e:
+    except Exception as e:
         raise CLIException(str(e))
     else:
-        click.echo(click.style(name, fg="green") + click.style(" ({})".format(svc["state"].capitalize()),
+        click.echo(click.style(name, fg="green") + click.style(" ({0})".format(svc["state"].capitalize()),
             fg="yellow" if svc["state"] == "running" else "red"))
-        click.secho(u" ↳ Type: {}".format(svc["type"].capitalize()), fg="white")
-        click.secho(u" ↳ Enabled on boot: {}".format("Yes" if svc["enabled"] else "No"), fg="white")
+        click.secho(u(" ↳ Type: {0}").format(svc["type"].capitalize()), fg="white")
+        click.secho(u(" ↳ Enabled on boot: {0}").format("Yes" if svc["enabled"] else "No"), fg="white")
 
 
 GROUPS = [[services, "service", "svc"]]
