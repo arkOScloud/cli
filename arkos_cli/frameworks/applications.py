@@ -2,7 +2,7 @@
 """Relates to commands for management of applications."""
 import click
 
-from arkos_cli.utils import u, abort_if_false, handle_job, CLIException, ClickMessager
+from arkos_cli.utils import abort_if_false, handle_job, CLIException, ClickMessager
 
 
 @click.group()
@@ -17,7 +17,7 @@ def _list_applications(apps):
     for x in sorted(apps, key=lambda x: x["name"]):
         imsg = click.style(" (" + x["version"] + ")", fg="yellow")
         click.echo(click.style(x["name"], fg="green") + imsg)
-        click.secho(u(" ↳ " + x["description"]["short"]), fg="white")
+        click.secho(u" ↳ " + x["description"]["short"], fg="white")
 
 
 @applications.command()
@@ -105,10 +105,10 @@ def info(ctx, id):
         click.echo(click.style(x["name"], fg="green") + imsg)
         for key in sorted(lines.keys()):
             imsg = click.style(lines[key], fg="white")
-            click.echo(u(" ↳ ") + click.style(key, fg="yellow") + " " + imsg)
+            click.echo(u" ↳ " + click.style(key, fg="yellow") + " " + imsg)
         if [y for y in x["dependencies"] if y["type"] == "app"]:
             deps = [y["name"] for y in x["dependencies"] if y["type"] == "app"]
-            click.echo(u(" ↳ ") + click.style("Depends on:", fg="yellow") +
+            click.echo(u" ↳ " + click.style("Depends on:", fg="yellow") +
                        " " + click.style(", ".join(deps), fg="white"))
 
 
@@ -120,16 +120,14 @@ def install(ctx, id):
     try:
         if ctx.obj["conn_method"] == "remote":
             job, data = ctx.obj["client"].applications.install(id=id)
-            click.secho("Installing application {}...".format(data["name"]),
-                        fg="green")
+            click.secho("Installing application {0}...".format(data["name"]),
+                        fg="cyan")
             handle_job(job)
         elif ctx.obj["conn_method"] == "local":
             from arkos import applications
             applications.get(id).install(message=ClickMessager(), force=True)
     except Exception as e:
         raise CLIException(str(e))
-    else:
-        click.secho("Application installed successfully.", bold=True)
 
 
 @applications.command()
@@ -142,16 +140,14 @@ def uninstall(ctx, id):
     try:
         if ctx.obj["conn_method"] == "remote":
             job, data = ctx.obj["client"].applications.uninstall(id=id)
-            click.secho("Uninstalling application {}...".format(data["name"]),
-                        fg="green")
+            click.secho("Uninstalling application {0}...".format(data["name"]),
+                        fg="cyan")
             handle_job(job)
         elif ctx.obj["conn_method"] == "local":
             from arkos import applications
             applications.get(id).uninstall(message=ClickMessager())
     except Exception as e:
         raise CLIException(str(e))
-    else:
-        click.secho("Application uninstalled successfully.", bold=True)
 
 
 GROUPS = [[applications, "application", "app", "apps"]]

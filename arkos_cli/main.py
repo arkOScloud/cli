@@ -15,7 +15,7 @@ except ImportError:
 from arkos_cli.utils import AliasedGroup, CLIException
 
 
-VERSION = "0.2"
+VERSION = "0.3"
 if __package__:
     import arkos_cli
     pname = arkos_cli.__file__

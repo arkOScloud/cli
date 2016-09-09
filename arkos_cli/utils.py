@@ -32,6 +32,8 @@ class ClickMessager:
             return "yellow"
         elif mcls == "error":
             return "red"
+        elif mcls == "info":
+            return "cyan"
         else:
             return None
 
@@ -73,15 +75,15 @@ def handle_job(job):
         job.check()
         if job.message and job.message != msg:
             fg = None
-            if job.message_class == "success":
+            if job.message["level"] == "success":
                 fg = "green"
-            elif job.message_class == "warning":
+            elif job.message["level"] == "warning":
                 fg = "yellow"
-            elif job.message_class == "error":
+            elif job.message["level"] == "error":
                 fg = "red"
-            hd = click.style(job.message_headline + " - ", fg=fg, bold=True)
-            hd = (hd if job.message_headline != "None" else "")
-            click.echo(hd + click.style(job.message, fg=fg))
+            hd = click.style(job.message["title"] + " - ", fg=fg, bold=True)
+            hd = (hd if job.message["title"] != "None" else "")
+            click.echo(hd + click.style(job.message["message"], fg=fg))
             msg = job.message
     if job.status != "success":
         if job.message and job.message != msg:

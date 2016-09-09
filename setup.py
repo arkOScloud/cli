@@ -5,10 +5,10 @@ from setuptools import setup, find_packages
 
 setup(
     name="arkos-cli",
-    version="0.1",
+    version="0.2",
     install_requires=[
         "click==6.0",
-        "pyarkosclient==0.1"
+        "pyarkosclient>=0.2"
     ],
     description="arkOS command-line interface",
     author='CitizenWeb',

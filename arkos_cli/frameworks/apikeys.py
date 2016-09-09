@@ -36,7 +36,7 @@ def list(ctx):
             click.secho("No keys found", bold=True)
         for x in keys:
             smsg = click.style(" [{}] ({})".format(x["user"], x["comment"]))
-            click.echo(x["key"] + smsg, fg="yellow")
+            click.secho(x["key"] + smsg, fg="yellow")
 
 
 @apikeys.command()

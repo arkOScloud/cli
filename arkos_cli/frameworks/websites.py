@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import click
 
-from arkos_cli.utils import u, AliasedGroup, abort_if_false, handle_job, CLIException, ClickMessager
+from arkos_cli.utils import AliasedGroup, abort_if_false, handle_job, CLIException, ClickMessager
 
 
 @click.command(cls=AliasedGroup)
@@ -18,11 +18,11 @@ def _list_websites(sites):
         url += x["addr"]
         url += (":{0}".format(x["port"])) if x["port"] not in [80, 443] else ""
         click.echo(click.style(x["id"], fg="green") + click.style(" (" + url +")", fg="yellow"))
-        click.secho(u(" ↳ Site Type: ") + x["site_name"], fg="white")
-        click.secho(u(" ↳ Uses SSL: {0}").format("Yes" if x["certificate"] else "No"), fg="white")
-        click.secho(u(" ↳ Enabled: {0}").format("Yes" if x["enabled"] else "No"), fg="white")
+        click.secho(u" ↳ Site Type: " + x["site_name"], fg="white")
+        click.secho(u" ↳ Uses SSL: {0}".format("Yes" if x["certificate"] else "No"), fg="white")
+        click.secho(u" ↳ Enabled: {0}".format("Yes" if x["enabled"] else "No"), fg="white")
         if x.get("has_update"):
-            click.secho(u(" ↳ Update available!"), fg="green")
+            click.secho(u" ↳ Update available!", fg="green")
 
 
 @websites.command()
